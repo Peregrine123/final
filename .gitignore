@@ -1,0 +1,13 @@
+# Local/IDE
+.idea/
+.claude/
+
+# Runtime artifacts created by dev scripts
+.run/
+
+# Backend runtime logs
+blc/log/
+
+# Scratch files
+temp.html
+.DS_Store
