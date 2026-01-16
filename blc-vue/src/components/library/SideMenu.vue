@@ -59,40 +59,42 @@ export default {
 <style scoped>
 .categories {
   position: sticky;
-  top: 80px;
+  top: 0;
   width: 100%;
-  padding: 10px;
-  border-right: 0;
-  border: 1px solid #ebeef5;
-  border-radius: 14px;
-  background: #fff;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-  max-height: calc(100vh - 140px);
-  overflow: auto;
+  height: 100vh;
+  padding: 20px 0;
+  border-right: 1px solid #ebeef5;
+  border-radius: 0;
+  background: #f9fafc;
+  box-shadow: none;
+  overflow-y: auto;
 }
 
 /* Element-UI internals: use deep selector to style menu items under scoped CSS. */
 .categories /deep/ .el-menu-item {
-  height: 44px;
-  line-height: 44px;
-  border-radius: 10px;
-  margin: 4px 0;
+  height: 50px;
+  line-height: 50px;
+  margin: 0;
+  border-radius: 0;
+  padding-left: 30px !important; /* Adjust padding for alignment */
 }
 
 .categories /deep/ .el-menu-item:hover {
-  background-color: rgba(238, 149, 114, 0.10) !important;
+  background-color: #ecf5ff !important;
 }
 
 .categories /deep/ .el-menu-item.is-active {
-  background-color: rgba(238, 149, 114, 0.16) !important;
-  font-weight: 600;
+  background-color: #ecf5ff !important;
+  color: #409EFF; /* Use a standard primary color or keep the orange if preferred, sticking to design doc suggestions */
+  border-right: 3px solid #409EFF;
 }
 
 .categories /deep/ .el-menu-item i {
   color: #909399;
+  margin-right: 10px;
 }
 
 .categories /deep/ .el-menu-item.is-active i {
-  color: #EE9572;
+  color: #409EFF;
 }
 </style>

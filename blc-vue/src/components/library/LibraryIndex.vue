@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-aside style="width: 200px;margin-top: 20px">
+    <el-aside style="width: 200px;">
       <SideMenu @indexSelect="listByCategory" ref="sideMenu"></SideMenu>
     </el-aside>
     <el-main>
