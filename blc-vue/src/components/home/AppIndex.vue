@@ -145,24 +145,24 @@
 
       <div class="movieslist">
         <div id="app" class="container">
-          <card data-image="https://img2.baidu.com/it/u=505381648,3692530915&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1222">
+          <card :data-image="cardImages[0]">
             <h1 slot="header">白蛇：浮生</h1>
             <p slot="content">爱让我接受最真实的你。
             </p>
           </card>
 
-          <card data-image="https://b0.bdstatic.com/5c7424e7410237293ed39e0f7ffcff96.jpg@h_1280">
+          <card :data-image="cardImages[1]">
             <h1 slot="header">盗梦空间</h1>
             <p slot="content">它是最好的玄幻小说，因为情节无懈可击。
             </p>
           </card>
 
-          <card data-image="https://wx1.sinaimg.cn/mw690/e979b63agy1hrx88dr5bvj22ld4cy7wh.jpg">
+          <card :data-image="cardImages[2]">
             <h1 slot="header">楚门的世界</h1>
             <p slot="content">我们每个人都是楚门</p>
           </card>
 
-          <card data-image="https://pic.rmb.bdstatic.com/bjh/240305/8b05f6f96dd82195b491cc29fc90f6636449.jpeg">
+          <card :data-image="cardImages[3]">
             <h1 slot="header">喜剧之王</h1>
             <p slot="content">飘飘，我来教你怎样拥抱。</p>
           </card>
@@ -189,6 +189,10 @@ import bgSina from "@/assets/home-bg/bg-sina.jpg";
 import bgZcool from "@/assets/home-bg/bg-zcool.jpg";
 import bgBaidu from "@/assets/home-bg/bg-baidu.jpg";
 import bgCanva from "@/assets/home-bg/bg-canva.jpg";
+import card1 from "@/assets/remote/appindex-card1.jpg";
+import card2 from "@/assets/remote/appindex-card2.jpg";
+import card3 from "@/assets/remote/appindex-card3.jpg";
+import card4 from "@/assets/remote/appindex-card4.jpeg";
 
 export default {
   name: "AppIndex",
@@ -199,13 +203,8 @@ export default {
     return {
       // Use local assets to avoid hotlink/403 issues and ensure consistent loading.
       backgroundImages: [bgSina, bgZcool, bgBaidu, bgCanva],
-      // 卡片图片链接（当前模板里未使用，先保留）
-      cardImages: [
-        "https://img2.baidu.com/it/u=505381648,3692530915&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1222",
-        "",
-        "",
-        "",
-      ],
+      // Local card images (avoid hotlink/403 and make the homepage usable offline).
+      cardImages: [card1, card2, card3, card4],
       currentImage: 0,
       _bgTimer: null,
     };
@@ -503,7 +502,7 @@ export default {
 .movie-img {
   width: 100%;
   height: 380px;
-  background-image: url(https://i.ibb.co/FDGqCmM/papers-co-ag74-interstellar-wide-space-film-movie-art-33-iphone6-wallpaper.jpg);
+  background-image: url(~@/assets/remote/appindex-poster1.jpg);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -517,7 +516,7 @@ export default {
 .movie-img1 {
   width: 100%;
   height: 380px;
-  background-image: url(https://img2.baidu.com/it/u=1601820106,4160962638&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=889);
+  background-image: url(~@/assets/remote/appindex-poster2.jpg);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;

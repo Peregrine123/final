@@ -126,13 +126,15 @@
 </template>
 
 <script>
+import defaultCover from "@/assets/remote/no-cover.svg";
+
 export default {
   name: 'MovieDetails',
   data() {
     return {
       movie: {},
       loading: true,
-      defaultCover: 'https://via.placeholder.com/300x450?text=No+Cover',
+      defaultCover,
       // Mock data for UI elements not supported by backend
       mockData: {
         rating: 4.5,
@@ -150,8 +152,9 @@ export default {
     heroStyle() {
       // Use cover as background or a default dark color
       const url = this.movie.cover || '';
+      const safe = String(url).replace(/\"/g, '\\\"');
       return {
-        backgroundImage: `url(${url})`,
+        backgroundImage: url ? `url(\"${safe}\")` : 'linear-gradient(135deg, #111827 0%, #374151 100%)',
         backgroundSize: 'cover',
         backgroundPosition: 'center top'
       };
