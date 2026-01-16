@@ -22,7 +22,7 @@ UPDATE blog_article
 SET
   article_abstract = '披着轻喜剧外衣的都市童话：关于孤独、勇气，以及一次看似偶然的相遇如何改变人生。',
   -- Use weserv.nl to proxy posters (Wikimedia may be slow/blocked in some networks).
-  article_cover = 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/f/f5/GorgeousPoster.jpg',
+  article_cover = '/api/file/seed-lib-bc614caa1682.jpg',
   article_date = CURDATE(),
   article_content_html =
 '<p><strong>一句话点评：</strong>它不靠宏大叙事取胜，而是用轻盈的节奏讲孤独，用一点点浪漫替现实松绑。</p>
@@ -80,7 +80,7 @@ WHERE article_title = '玻璃樽';
 UPDATE blog_article
 SET
   article_abstract = '喜剧的壳、悲剧的核：当你笑着回头，才发现“成长”是学会接受错过。',
-  article_cover = 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/0/0c/A_Chinese_Odyssey_2.jpg',
+  article_cover = '/api/file/seed-lib-ffa70b160246.jpg',
   article_date = CURDATE(),
   article_content_html =
 '<p><strong>一句话点评：</strong>它最狠的地方在于：把遗憾拍成了笑话，让你在笑声里突然沉默。</p>
@@ -138,7 +138,7 @@ WHERE article_title = '大话西游';
 UPDATE blog_article
 SET
   article_abstract = '公路尽头不是答案，是选择：关于理想、现实与年轻人的沉默告别。',
-  article_cover = 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/5/5b/Houhuiwuqi_poster.jpg',
+  article_cover = '/api/file/seed-lib-6d2b41de8e14.jpg',
   article_date = CURDATE(),
   article_content_html =
 '<p><strong>一句话点评：</strong>看起来很松，内里很硬。它用漫不经心的口吻，讲一代人的认真。</p>
@@ -177,7 +177,7 @@ WHERE article_title = '后会无期';
 UPDATE blog_article
 SET
   article_abstract = '极美的画面里藏着成长的代价：当选择变得沉重，童话就不再轻飘。',
-  article_cover = 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/d/dc/P2361744534.jpg',
+  article_cover = '/api/file/seed-lib-662ee4896778.jpg',
   article_date = CURDATE(),
   article_content_html =
 '<p><strong>一句话点评：</strong>它的美术几乎无可挑剔，而故事的争议点也恰恰来自它的“执念”。</p>
@@ -253,7 +253,7 @@ SELECT
 
 4.6 / 5。',
   '霓虹与雨夜里的孤独：一部把想念拍成味道的电影。',
-  'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/c/c0/Chungking_Express.jpg',
+  '/api/file/seed-lib-c376678bc57e.jpg',
   CURDATE()
 WHERE NOT EXISTS (SELECT 1 FROM blog_article WHERE article_title = '重庆森林');
 
@@ -285,7 +285,7 @@ SELECT
 
 4.4 / 5。适合和朋友一起看，边看边聊会更爽。',
   '爽感之下是叙事博弈：每个人都在讲故事，真相反而最安静。',
-  'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/c/c6/Let_the_Bullets_Fly_Poster.jpg',
+  '/api/file/seed-lib-87f0e348dd73.jpg',
   CURDATE()
 WHERE NOT EXISTS (SELECT 1 FROM blog_article WHERE article_title = '让子弹飞');
 
@@ -317,7 +317,7 @@ SELECT
 
 4.8 / 5。它值得你在不同阶段重看。',
   '戏里戏外皆人生：一部关于命运、时代与自我认同的史诗。',
-  'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/0/0c/Bawangbieji.jpg',
+  '/api/file/seed-lib-805a268c694c.jpg',
   CURDATE()
 WHERE NOT EXISTS (SELECT 1 FROM blog_article WHERE article_title = '霸王别姬');
 
@@ -349,7 +349,7 @@ SELECT
 
 4.7 / 5。',
   '童话写给大人：在失控的世界里，学会守住自己。',
-  'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/0/09/Spirited_away_poster.jpg',
+  '/api/file/seed-lib-e55e0fc9fef4.jpg',
   CURDATE()
 WHERE NOT EXISTS (SELECT 1 FROM blog_article WHERE article_title = '千与千寻');
 
@@ -381,7 +381,7 @@ SELECT
 
 4.5 / 5。',
   '用宇宙讲亲情：科学越冷，情感越热。',
-  'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/b/bc/Interstellar_film_poster.jpg',
+  '/api/file/seed-lib-1674ecce787b.jpg',
   CURDATE()
 WHERE NOT EXISTS (SELECT 1 FROM blog_article WHERE article_title = '星际穿越');
 
@@ -413,7 +413,7 @@ SELECT
 
 4.3 / 5。',
   '身份与命运的对撞：每个人都在黑白之间走钢丝。',
-  'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/a/a3/Infernal_Affairs.jpg',
+  '/api/file/seed-lib-3ec3ca3c7c66.jpg',
   CURDATE()
 WHERE NOT EXISTS (SELECT 1 FROM blog_article WHERE article_title = '无间道');
 
@@ -445,7 +445,7 @@ SELECT
 
 4.2 / 5。',
   '关于相遇与错过：把青春拍成一封迟到的信。',
-  'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/4/4e/Your_name_poster.jpg',
+  '/api/file/seed-lib-c7e0d6035c4c.jpg',
   CURDATE()
 WHERE NOT EXISTS (SELECT 1 FROM blog_article WHERE article_title = '你的名字');
 
@@ -477,7 +477,7 @@ SELECT
 
 4.1 / 5。',
   '把家背在身上：一部带着热度的中国科幻。',
-  'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/0/05/%E3%80%8A%E6%B5%81%E6%B5%AA%E5%9C%B0%E7%90%83%E3%80%8B%E7%94%B5%E5%BD%B1%E6%B5%B7%E6%8A%A5.jpg',
+  '/api/file/seed-lib-d4100d1c051b.jpg',
   CURDATE()
 WHERE NOT EXISTS (SELECT 1 FROM blog_article WHERE article_title = '流浪地球');
 
@@ -485,18 +485,18 @@ WHERE NOT EXISTS (SELECT 1 FROM blog_article WHERE article_title = '流浪地球
 -- 4) Keep covers in sync when re-running (even if rows already exist).
 UPDATE blog_article
 SET article_cover = CASE article_title
-  WHEN '玻璃樽' THEN 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/f/f5/GorgeousPoster.jpg'
-  WHEN '大话西游' THEN 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/0/0c/A_Chinese_Odyssey_2.jpg'
-  WHEN '后会无期' THEN 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/5/5b/Houhuiwuqi_poster.jpg'
-  WHEN '大鱼海棠' THEN 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/d/dc/P2361744534.jpg'
-  WHEN '重庆森林' THEN 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/c/c0/Chungking_Express.jpg'
-  WHEN '让子弹飞' THEN 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/c/c6/Let_the_Bullets_Fly_Poster.jpg'
-  WHEN '霸王别姬' THEN 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/0/0c/Bawangbieji.jpg'
-  WHEN '千与千寻' THEN 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/0/09/Spirited_away_poster.jpg'
-  WHEN '星际穿越' THEN 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/b/bc/Interstellar_film_poster.jpg'
-  WHEN '无间道' THEN 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/a/a3/Infernal_Affairs.jpg'
-  WHEN '你的名字' THEN 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/4/4e/Your_name_poster.jpg'
-  WHEN '流浪地球' THEN 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/zh/0/05/%E3%80%8A%E6%B5%81%E6%B5%AA%E5%9C%B0%E7%90%83%E3%80%8B%E7%94%B5%E5%BD%B1%E6%B5%B7%E6%8A%A5.jpg'
+  WHEN '玻璃樽' THEN '/api/file/seed-lib-bc614caa1682.jpg'
+  WHEN '大话西游' THEN '/api/file/seed-lib-ffa70b160246.jpg'
+  WHEN '后会无期' THEN '/api/file/seed-lib-6d2b41de8e14.jpg'
+  WHEN '大鱼海棠' THEN '/api/file/seed-lib-662ee4896778.jpg'
+  WHEN '重庆森林' THEN '/api/file/seed-lib-c376678bc57e.jpg'
+  WHEN '让子弹飞' THEN '/api/file/seed-lib-87f0e348dd73.jpg'
+  WHEN '霸王别姬' THEN '/api/file/seed-lib-805a268c694c.jpg'
+  WHEN '千与千寻' THEN '/api/file/seed-lib-e55e0fc9fef4.jpg'
+  WHEN '星际穿越' THEN '/api/file/seed-lib-1674ecce787b.jpg'
+  WHEN '无间道' THEN '/api/file/seed-lib-3ec3ca3c7c66.jpg'
+  WHEN '你的名字' THEN '/api/file/seed-lib-c7e0d6035c4c.jpg'
+  WHEN '流浪地球' THEN '/api/file/seed-lib-d4100d1c051b.jpg'
   ELSE article_cover
 END
 WHERE article_title IN (

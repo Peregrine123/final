@@ -142,6 +142,8 @@
 - 数据侧外网封面落地：
   - `blc/blc.sql`：`https://i.loli.net/2019/04/10/<filename>` -> `/api/file/<filename>`（对应文件已在 `blc/uploads/`）。
   - `blc/blc.sql` 与 `blc/seed-blog-2026.sql`：`http://localhost:8443/api/file/<filename>` -> `/api/file/<filename>`（避免写死 host，提升跨环境可移植性）。
+  - `blc/seed-blog-2026.sql`：外部海报（`images.weserv.nl`）已本地化为 `/api/file/seed-lib-<hash>.<ext>`（对应文件已在 `blc/uploads/`）。
+  - `blc/seed-library-2026.sql`：`https://images.weserv.nl/?url=upload.wikimedia.org/...` -> `/api/file/seed-lib-<hash>.<ext>`（海报已下载并落地到 `blc/uploads/`，保证影库/影单示例数据离线可用）。
 
 #### 种子数据：localhost `/api/file/`（依赖后端上传目录/静态映射）
 - `blc/blc.sql`

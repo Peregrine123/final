@@ -109,15 +109,21 @@
             <div slot="header">
               <span>相关推荐</span>
             </div>
-            <div class="related-movies">
-              <div v-for="i in 3" :key="i" class="related-item">
-                 <div class="placeholder-poster"></div>
-                 <div class="related-info">
-                   <div class="related-title">推荐电影 {{ i }}</div>
-                   <div class="related-meta">202{{ i }}</div>
-                 </div>
+            <div v-if="relatedMovies.length" class="related-movies">
+              <div
+                v-for="m in relatedMovies"
+                :key="m.id"
+                class="related-item"
+                @click="goToMovieDetails(m.id)"
+              >
+                <img :src="m.cover || defaultCover" alt="Poster" class="related-poster">
+                <div class="related-info">
+                  <div class="related-title">{{ m.title }}</div>
+                  <div class="related-meta">{{ m.date ? m.date.substring(0, 4) : '' }}</div>
+                </div>
               </div>
             </div>
+            <div v-else class="related-empty">暂无相关推荐</div>
           </el-card>
         </el-col>
       </el-row>
@@ -133,6 +139,7 @@ export default {
   data() {
     return {
       movie: {},
+      relatedMovies: [],
       loading: true,
       defaultCover,
       // Mock data for UI elements not supported by backend
@@ -163,10 +170,16 @@ export default {
   created() {
     this.loadMovieDetails();
   },
+  watch: {
+    '$route.params.id': function () {
+      this.loadMovieDetails();
+    }
+  },
   methods: {
     loadMovieDetails() {
       const id = parseInt(this.$route.params.id); // Ensure ID type matches
       this.loading = true;
+      this.relatedMovies = [];
       this.$axios.get('/movies').then(resp => {
         if (resp && resp.status === 200) {
           const movies = resp.data;
@@ -179,6 +192,7 @@ export default {
             this.movie = found;
             // Generate deterministic mock rating based on ID for consistency
             this.mockData.rating = (id % 5) + 1; // Random-ish rating 1-5
+            this.relatedMovies = this.buildRelatedMovies(movies, found, 3);
           } else {
             this.$message.error('未找到该电影信息');
           }
@@ -189,6 +203,39 @@ export default {
         this.loading = false;
         this.$message.error('加载失败');
       });
+    },
+    buildRelatedMovies(allMovies, currentMovie, limit) {
+      const safeLimit = Math.max(0, parseInt(limit) || 0);
+      if (!Array.isArray(allMovies) || !currentMovie || !safeLimit) return [];
+
+      const currentId = currentMovie.id;
+      const cid = currentMovie.category && currentMovie.category.id;
+
+      const withCategory = Array.isArray(allMovies) ? allMovies : [];
+      const candidates = cid
+        ? withCategory.filter(m => m && m.category && m.category.id === cid)
+        : withCategory.slice();
+
+      if (candidates.length <= 1) return [];
+
+      // Stable order by id so "附近" has a clear meaning.
+      candidates.sort((a, b) => (a.id || 0) - (b.id || 0));
+
+      const idx = candidates.findIndex(m => m && m.id == currentId);
+      const prev = idx > 0 ? candidates.slice(0, idx).reverse() : [];
+      const next = idx >= 0 ? candidates.slice(idx + 1) : candidates.filter(m => m && m.id != currentId);
+
+      const related = [];
+      for (let i = 0; related.length < safeLimit && (i < next.length || i < prev.length); i++) {
+        if (i < next.length && next[i] && next[i].id != currentId) related.push(next[i]);
+        if (related.length >= safeLimit) break;
+        if (i < prev.length && prev[i] && prev[i].id != currentId) related.push(prev[i]);
+      }
+      return related.slice(0, safeLimit);
+    },
+    goToMovieDetails(id) {
+      if (!id && id !== 0) return;
+      this.$router.push({ name: 'MovieDetails', params: { id } });
     }
   }
 };
@@ -407,14 +454,22 @@ export default {
   display: flex;
   margin-bottom: 15px;
   align-items: center;
+  cursor: pointer;
 }
 
-.placeholder-poster {
+.related-poster {
   width: 50px;
   height: 75px;
-  background-color: #eee;
   margin-right: 15px;
   border-radius: 4px;
+  object-fit: cover;
+  background-color: #eee;
+}
+
+.related-empty {
+  color: #999;
+  font-size: 0.9rem;
+  padding: 8px 0;
 }
 
 .related-title {
