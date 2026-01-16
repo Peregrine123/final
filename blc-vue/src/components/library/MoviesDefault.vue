@@ -1,45 +1,40 @@
 <template>
-  <div>
-    <el-row style="height: 620px;">
-      <search-bar @onSearch="searchResult" ref="searchBar"></search-bar>
-      <el-tooltip effect="dark" placement="right"
-                  v-for="item in movies.slice((currentPage-1)*pagesize,currentPage*pagesize)"
-                  :key="item.id">
-        <p slot="content" style="font-size: 14px;margin-bottom: 6px;">{{item.title}}</p>
-        <p slot="content" style="font-size: 13px;margin-bottom: 6px">
-          <span>{{item.cast}}</span> /
-          <span>{{item.date}}</span> /
-          <span>{{item.press}}</span>
-        </p>
-        <p slot="content" style="width: 300px" class="abstract">{{item.summary}}</p>
-        <el-card style="width: 135px;margin-bottom: 20px;height: 233px;float: left;margin-right: 15px" class="movie"
-                 bodyStyle="padding:10px" shadow="hover">
-          <div class="cover">
-            <img :src="item.cover" alt="封面">
-          </div>
-          <div class="info">
-            <div class="title">
-              <a href="" @click.prevent="goToMovieDetails(item.id)">{{item.title}}</a>
-<!--              yiiiiiiiiiiiiiiiiiiiiiiiii-->
-            </div>
-          </div>
-          <div class="cast">{{item.cast}}</div>
-        </el-card>
-      </el-tooltip>
-    </el-row>
-    <el-row>
+  <div class="movies-container">
+	    <el-row style="margin-bottom: 30px;">
+	      <search-bar @onSearch="searchResult" ref="searchBar"></search-bar>
+	    </el-row>
+
+	    <div class="masonry-wrapper">
+	      <div class="masonry-item"
+	           v-for="item in movies.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+	           :key="item.id">
+
+	        <div class="movie-card" @click="goToMovieDetails(item.id)">
+	           <div class="poster-wrapper">
+	             <img :src="item.cover" alt="封面" class="movie-img">
+	           </div>
+           <div class="movie-info">
+             <div class="movie-title">{{item.title}}</div>
+             <div class="movie-year" v-if="item.date">{{item.date}}</div>
+           </div>
+        </div>
+      </div>
+    </div>
+
+    <el-row type="flex" justify="center" style="margin-top: 40px; margin-bottom: 40px;">
       <el-pagination
           @current-change="handleCurrentChange"
           :current-page="currentPage"
           :page-size="pagesize"
-          :total="movies.length">
+          :total="movies.length"
+          background
+          layout="prev, pager, next">
       </el-pagination>
     </el-row>
   </div>
 </template>
 
 <script>
-import EditForm from "./EditForm";
 import SearchBar from './SearchBar'
 export default {
   name: 'MoviesDefault',
@@ -65,7 +60,6 @@ export default {
     },
     handleCurrentChange: function (currentPage) {
       this.currentPage = currentPage
-      // console.log(this.currentPage)
     },
     searchResult () {
       var _this = this
@@ -83,47 +77,89 @@ export default {
   }
 }
 </script>
+
 <style scoped>
+.movies-container {
+  width: 90%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding-top: 30px;
+}
 
-.cover {
-  width: 115px;
-  height: 172px;
-  margin-bottom: 7px;
-  overflow: hidden;
+.masonry-wrapper {
+  column-count: 6;
+  column-gap: 20px;
+}
+
+@media (max-width: 1400px) {
+  .masonry-wrapper {
+    column-count: 5;
+  }
+}
+
+@media (max-width: 1200px) {
+  .masonry-wrapper {
+    column-count: 4;
+  }
+}
+
+@media (max-width: 992px) {
+  .masonry-wrapper {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 600px) {
+  .masonry-wrapper {
+    column-count: 2;
+  }
+}
+
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: 24px;
+}
+
+.movie-card {
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-img {
-  width: 115px;
-  height: 172px;
-  /*margin: 0 auto;*/
+/* Subtle hover effect: brightness, NO movement */
+.movie-card:hover {
+  filter: brightness(1.08);
 }
 
-.title {
-  font-size: 14px;
-  text-align: left;
+.poster-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  line-height: 0;
 }
 
-.author {
-  color: #333;
-  width: 102px;
-  font-size: 13px;
-  margin-bottom: 6px;
-  text-align: left;
-}
-
-.abstract {
+.movie-img {
+  width: 100%;
+  height: auto;
   display: block;
-  line-height: 17px;
+  object-fit: cover;
 }
 
-a {
-  text-decoration: none;
+.movie-info {
+  padding: 10px 4px 0 4px;
 }
 
-a:link, a:visited, a:focus {
-  color: #3377aa;
+.movie-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  line-height: 1.3;
+  margin-bottom: 4px;
 }
 
+.movie-year {
+  font-size: 13px;
+  color: #888;
+}
 </style>
-

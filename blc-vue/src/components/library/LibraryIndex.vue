@@ -35,7 +35,8 @@ export default {
 
 <style scoped>
 .movies-area {
-  width: 990px;
+  width: 100%;
+  max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
 }
