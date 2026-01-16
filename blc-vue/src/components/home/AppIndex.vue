@@ -9,7 +9,7 @@
           :key="index"
           :class="{ active: currentImage === index }"
       >
-        <img :src="image" />
+        <img :src="image" @error="console.warn('[bg] load failed', index, image)" />
       </div>
     </div>
 
@@ -183,66 +183,76 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
 import { gsap } from "gsap";
 import Card from "@/components/Card.vue";
+import bgSina from "@/assets/home-bg/bg-sina.jpg";
+import bgZcool from "@/assets/home-bg/bg-zcool.jpg";
+import bgBaidu from "@/assets/home-bg/bg-baidu.jpg";
+import bgCanva from "@/assets/home-bg/bg-canva.jpg";
 
 export default {
   name: "AppIndex",
   components: {
     Card,
   },
-  setup() {
-    const background = ref(null);
-    const content = ref(null);
-
-
-    // 背景轮播图片链接
-    const backgroundImages = ref([
-      "https://n.sinaimg.cn/games/20160420/QDQz-fxrizpp1861000.jpg",
-      "https://img.zcool.cn/community/015d2a56e3e5be32f875520fed89af.jpg",
-      "https://img0.baidu.com/it/u=458353925,1739178529&fm=253&fmt=auto&app=138&f=JPEG?w=1500&h=500",
-      "https://static-cse.canva.cn/blob/234759/3647ea0c0ae4256900915832555af88.jpg"
-
-    ]);
-
-    // 卡片图片链接
-    const cardImages = ref([
-      // "https://images.unsplash.com/photo-1479660656269-197ebb83b540?dpr=2&auto=compress,format&fit=crop&w=1199&h=798&q=80&cs=tinysrgb&crop=",
-     "https://img2.baidu.com/it/u=505381648,3692530915&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1222",
-     "",
-     "",
-     ""
-    ]);
-
-    const currentImage = ref(0);
-
-    const startAnimation = () => {
+  data() {
+    return {
+      // Use local assets to avoid hotlink/403 issues and ensure consistent loading.
+      backgroundImages: [bgSina, bgZcool, bgBaidu, bgCanva],
+      // 卡片图片链接（当前模板里未使用，先保留）
+      cardImages: [
+        "https://img2.baidu.com/it/u=505381648,3692530915&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1222",
+        "",
+        "",
+        "",
+      ],
+      currentImage: 0,
+      _bgTimer: null,
+    };
+  },
+  mounted() {
+    // Preload to prevent "blank" frames when switching (some backgrounds are large).
+    this.preloadBackgroundImages().then(() => {
+      this.startAnimation();
+    });
+  },
+  beforeDestroy() {
+    if (this._bgTimer) clearInterval(this._bgTimer);
+  },
+  methods: {
+    preloadBackgroundImages() {
+      const urls = Array.isArray(this.backgroundImages) ? this.backgroundImages : [];
+      return Promise.all(
+        urls.map(
+          (src) =>
+            new Promise((resolve) => {
+              const img = new Image();
+              img.onload = () => resolve({ src, ok: true });
+              img.onerror = () => resolve({ src, ok: false });
+              img.src = src;
+            })
+        )
+      );
+    },
+    startAnimation() {
       // 背景黑色淡出
-      gsap.to(background.value, {
+      gsap.to(this.$refs.background, {
         duration: 1,
         backgroundColor: "transparent",
       });
 
       // 文字淡入
-      gsap.to(content.value, {
+      gsap.to(this.$refs.content, {
         duration: 1.5,
         delay: 1,
         opacity: 1,
       });
 
       // 背景图轮播
-      setInterval(() => {
-        currentImage.value =
-            (currentImage.value + 1) % backgroundImages.value.length;
+      this._bgTimer = setInterval(() => {
+        this.currentImage = (this.currentImage + 1) % this.backgroundImages.length;
       }, 5000); // 每 5 秒切换一次
-    };
-
-    onMounted(() => {
-      startAnimation();
-    });
-
-    return { background, content, backgroundImages, cardImages, currentImage };
+    },
   },
 };
 </script>
@@ -265,16 +275,23 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  width: 1500px;
-  height: 500px;
+  width: 100%;
+  height: 100%;
   opacity: 0;
   filter: blur(3px);
   transition: opacity 1s ease, filter 1s ease;
 }
 
+.background-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .background-image.active {
   opacity: 1;
-  filter: blur(1);
+  filter: blur(1px);
 }
 
 /* 中心文字内容 */
