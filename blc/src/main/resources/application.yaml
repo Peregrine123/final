@@ -1,10 +1,8 @@
 spring:
 ###########datasource###########
   datasource:
-    username: root
-    password: root
-    url: jdbc:mysql://127.0.0.1:3306/blc?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    # Connection settings live in application.properties (url/username/password/driver).
+    # Keep only Druid-specific tuning here to avoid conflicting datasource configs.
     type: com.alibaba.druid.pool.DruidDataSource
       #Spring Boot 默认是不注入这些属性值的，需要自己绑定
     #druid 数据源专有配置

@@ -21,11 +21,21 @@ public class LoginController {
     @Autowired
     UserService userService;
 
+    private String normalizeUsername(String username) {
+        if (username == null) {
+            return "";
+        }
+        return HtmlUtils.htmlEscape(username).trim();
+    }
+
     @GetMapping(value = "/api/login/check")
     @ResponseBody
     public Result loginCheck(@RequestParam String username) {
         //只能检测用户名是否正确，不能检测密码
-        username = HtmlUtils.htmlEscape(username);
+        username = normalizeUsername(username);
+        if (username.isEmpty()) {
+            return ResultFactory.buildFailResult("用户名不能为空");
+        }
 
         boolean exist = userService.isExist(username);
         if (!exist) {
@@ -39,8 +49,14 @@ public class LoginController {
     @ResponseBody
     @GetMapping(value = "api/user/role")
     public Result roleCheck(@RequestParam String username){
-        username = HtmlUtils.htmlEscape(username);
+        username = normalizeUsername(username);
+        if (username.isEmpty()) {
+            return ResultFactory.buildFailResult("用户名不能为空");
+        }
         User user = userService.getByUserName(username);
+        if (user == null) {
+            return ResultFactory.buildFailResult("用户名不存在");
+        }
         String role = user.getRole();
 
         System.out.println(role);
@@ -50,7 +66,13 @@ public class LoginController {
     @PostMapping(value = "/api/login")
     @ResponseBody
     public Result login(@RequestBody User requestUser) {
-        String username = requestUser.getUsername();
+        if (requestUser == null) {
+            return ResultFactory.buildFailResult("用户名或密码不能为空");
+        }
+        String username = normalizeUsername(requestUser.getUsername());
+        if (username.isEmpty() || requestUser.getPassword() == null || requestUser.getPassword().trim().isEmpty()) {
+            return ResultFactory.buildFailResult("用户名或密码不能为空");
+        }
         Subject subject = SecurityUtils.getSubject();
 
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username, requestUser.getPassword());
@@ -69,7 +91,10 @@ public class LoginController {
     @ResponseBody
     public Result registerCheck(@RequestParam("username") String username) {
 
-        username = HtmlUtils.htmlEscape(username);//Html编码转译,防止恶意注册
+        username = normalizeUsername(username);//Html编码转译,防止恶意注册
+        if (username.isEmpty()) {
+            return ResultFactory.buildFailResult("用户名不能为空");
+        }
 
         boolean exist = userService.isExist(username);
         if (exist) {
@@ -83,9 +108,17 @@ public class LoginController {
     @ResponseBody
     public Result register(@RequestBody User user) {
 
-        String username = user.getUsername();
+        if (user == null) {
+            return ResultFactory.buildFailResult("用户名或密码不能为空");
+        }
+        String username = normalizeUsername(user.getUsername());
         String password = user.getPassword();
-        username = HtmlUtils.htmlEscape(username);
+        if (username.isEmpty()) {
+            return ResultFactory.buildFailResult("用户名不能为空");
+        }
+        if (password == null || password.trim().isEmpty()) {
+            return ResultFactory.buildFailResult("密码不能为空");
+        }
         user.setUsername(username);
 
         boolean exist = userService.isExist(username);

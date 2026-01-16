@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -18,7 +20,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.not;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -152,5 +156,108 @@ class AuthFlowTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(400))
                 .andExpect(jsonPath("$.message").value("账号或密码错误"));
+    }
+
+    @Test
+    void authentication_requires_login() throws Exception {
+        mockMvc.perform(get("/api/authentication"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value(401))
+                .andExpect(jsonPath("$.message").value("未登录或登录已过期"));
+    }
+
+    @Test
+    void login_session_allows_access_to_protected_endpoints_then_logout_revokes() throws Exception {
+        String username = "diana";
+        String password = "pw";
+
+        Map<String, Object> registerBody = new HashMap<>();
+        registerBody.put("username", username);
+        registerBody.put("password", password);
+
+        mockMvc.perform(
+                        post("/api/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(registerBody))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        Map<String, Object> loginBody = new HashMap<>();
+        loginBody.put("username", username);
+        loginBody.put("password", password);
+
+        MvcResult loginResult = mockMvc.perform(
+                        post("/api/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(loginBody))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andReturn();
+
+        MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession(false);
+
+        // Should be authenticated for the same session.
+        mockMvc.perform(get("/api/authentication").session(session))
+                .andExpect(status().isOk())
+                .andExpect(content().string("身份认证成功"));
+
+        mockMvc.perform(get("/api/logout").session(session))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        // After logout, the same session should no longer be able to access protected APIs.
+        mockMvc.perform(get("/api/authentication").session(session))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value(401));
+    }
+
+    @Test
+    void register_blank_username_fails() throws Exception {
+        Map<String, Object> registerBody = new HashMap<>();
+        registerBody.put("username", "   ");
+        registerBody.put("password", "p");
+
+        mockMvc.perform(
+                        post("/api/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(registerBody))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message").value("用户名不能为空"));
+    }
+
+    @Test
+    void register_blank_password_fails() throws Exception {
+        Map<String, Object> registerBody = new HashMap<>();
+        registerBody.put("username", "eve");
+        registerBody.put("password", "   ");
+
+        mockMvc.perform(
+                        post("/api/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(registerBody))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message").value("密码不能为空"));
+    }
+
+    @Test
+    void login_blank_credentials_fails() throws Exception {
+        Map<String, Object> loginBody = new HashMap<>();
+        loginBody.put("username", "");
+        loginBody.put("password", "");
+
+        mockMvc.perform(
+                        post("/api/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(loginBody))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message").value("用户名或密码不能为空"));
     }
 }

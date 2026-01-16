@@ -26,8 +26,9 @@ public class MyWebConfigurer implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry){
         registry.addInterceptor(getLoginIntercepter())
-                .addPathPatterns("/**")
-                .excludePathPatterns("/index.html")
+                // Only protect backend APIs. Frontend SPA routes/static assets must remain accessible
+                // so the login/register pages can render before authentication.
+                .addPathPatterns("/api/**")
                 .excludePathPatterns("/api/login")
                 .excludePathPatterns("/api/register")
                 .excludePathPatterns("/api/logout")
@@ -42,9 +43,10 @@ public class MyWebConfigurer implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
 
-        registry.addMapping("/**")
+        registry.addMapping("/api/**")
                 .allowCredentials(true)
-                .allowedOrigins("http://localhost:8080")
+                // local dev: support both localhost and 127.0.0.1
+                .allowedOrigins("http://localhost:8080", "http://127.0.0.1:8080")
                 .allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE")
                 .allowedHeaders("*");
     }
