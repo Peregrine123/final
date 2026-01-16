@@ -26,6 +26,8 @@ npm install
 ./dev-up.sh
 ```
 
+WSL 注意：如果仓库在 `/mnt/<盘符>/...`（例如 `/mnt/d/...`），前端 dev server 可能会因为 9p 文件系统非常慢/卡住。建议把项目放到 WSL 的 Linux 文件系统目录（比如 `~/projects/...`）。本项目脚本会把 Maven 本地仓库、npm cache 放到 `.run/`，减少反复下载与写入开销。
+
 访问：
 
 - 前端：http://localhost:8080
@@ -86,4 +88,3 @@ npm run serve
 ```bash
 VUE_APP_API_TARGET=http://localhost:8443 npm run serve
 ```
-

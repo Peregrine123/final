@@ -2,53 +2,52 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-RUN_DIR="$ROOT_DIR/.run"
+RUN_DIR="${ROOT_DIR}/.run"
 
-stop_pidfile() {
+BACKEND_PID_FILE="${RUN_DIR}/backend.pid"
+FRONTEND_PID_FILE="${RUN_DIR}/frontend.pid"
+
+kill_by_pidfile() {
   local name="$1"
-  local pidfile="$RUN_DIR/$2"
+  local pid_file="$2"
 
-  if [[ ! -f "$pidfile" ]]; then
-    echo "  $name: pidfile not found ($pidfile)"
+  if [[ ! -f "${pid_file}" ]]; then
+    echo "[dev-down] ${name}: pid file not found (${pid_file})"
     return 0
   fi
 
   local pid
-  pid="$(cat "$pidfile" || true)"
-  if [[ -z "${pid:-}" ]]; then
-    echo "  $name: empty pidfile ($pidfile)"
+  pid="$(cat "${pid_file}" || true)"
+  if [[ -z "${pid}" ]]; then
+    echo "[dev-down] ${name}: empty pid file (${pid_file})"
+    rm -f "${pid_file}"
     return 0
   fi
 
-  if ! kill -0 "$pid" 2>/dev/null; then
-    echo "  $name: not running (pid $pid)"
+  if ! kill -0 "${pid}" >/dev/null 2>&1; then
+    echo "[dev-down] ${name}: not running (stale pid ${pid})"
+    rm -f "${pid_file}"
     return 0
   fi
 
-  echo "  stopping $name (pid $pid)..."
-  kill "$pid" 2>/dev/null || true
+  echo "[dev-down] stopping ${name} (pid ${pid}) ..."
+  kill "${pid}" >/dev/null 2>&1 || true
 
-  for _ in $(seq 1 30); do
-    if ! kill -0 "$pid" 2>/dev/null; then
-      echo "  $name: stopped"
+  # Graceful wait up to ~10s.
+  for _ in {1..20}; do
+    if ! kill -0 "${pid}" >/dev/null 2>&1; then
+      rm -f "${pid_file}"
+      echo "[dev-down] ${name}: stopped"
       return 0
     fi
-    sleep 1
+    sleep 0.5
   done
 
-  echo "  $name: force killing (pid $pid)..."
-  kill -9 "$pid" 2>/dev/null || true
+  echo "[dev-down] ${name}: still running; sending SIGKILL"
+  kill -9 "${pid}" >/dev/null 2>&1 || true
+  rm -f "${pid_file}"
 }
 
-echo "Stopping frontend/backend..."
-stop_pidfile "frontend" "frontend.pid"
-stop_pidfile "backend (mvn)" "backend.pid"
+kill_by_pidfile "frontend" "${FRONTEND_PID_FILE}"
+kill_by_pidfile "backend" "${BACKEND_PID_FILE}"
 
-# In case the Vue dev server was started via npm previously, it may leave the
-# underlying vue-cli-service process running even after stopping the npm PID.
-pgrep -f "blc-vue/node_modules/.*/@vue/cli-service/bin/vue-cli-service\\.js serve" | xargs -r kill 2>/dev/null || true
-
-# In case Spring Boot devtools forked a child JVM, stop it too.
-pgrep -f "com\\.jiyu\\.BlcApplication" | xargs -r kill 2>/dev/null || true
-
-echo "Done."
