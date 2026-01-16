@@ -1,9 +1,8 @@
 
 <template>
-  <div style="margin-top: 40px">
-<!--    <div class="articles-area">-->
-      <div>
-      <el-card :body-style="{display:'flex',width:'100%'}" v-for="article in articles" :key="article.id" class="blog-card">
+  <div class="articles-area">
+    <div class="cards-list">
+      <el-card :body-style="{ padding: '0px' }" v-for="article in articles" :key="article.id" class="blog-card" shadow="hover">
 
         <div class="meta">
           <!-- 设置文章封面图片为背景图 -->
@@ -24,7 +23,8 @@
         layout="total, prev, pager, next, jumper"
         @current-change="handleCurrentChange"
         :page-size="pageSize"
-        :total="total">
+        :total="total"
+        class="pagination">
     </el-pagination>
   </div>
 </template>
@@ -68,26 +68,26 @@ export default {
 
 <style scoped>
 .articles-area {
-  width: 990px;
-  height: 750px;
-  margin-left: auto;
-  margin-right: auto;
+  width: 95%;
+  max-width: 1200px;
+  margin: 0 auto;
+  /* Removed fixed height to allow content to grow */
+  padding-bottom: 40px;
 }
 
-
-.el-card__body {
-  display: flex !important; /* 强制启用 flex 布局 */
-  flex-direction: row; /* 设置子元素水平排列 */
+/* ElementUI's internal DOM isn't affected by scoped selectors; use deep selector here. */
+.blog-card >>> .el-card__body {
+  display: flex;
+  flex-direction: column; /* mobile-first */
+  width: 100%;
+  padding: 0 !important;
 }
 
 .blog-card {
-  display: flex ;
-  flex-direction: row;
   width: 100%;
-  grid-template-columns: 1fr 1fr;
   margin: 1rem auto;
   box-shadow: 0 3px 7px -1px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1.6%;
+  margin-bottom: 20px;
   background: #fff;
   line-height: 1.4;
   font-family: sans-serif;
@@ -106,7 +106,7 @@ export default {
 }
 .blog-card .meta {
   position: relative;
-  flex-basis: 50%;
+  width: 100%; /* Mobile full width */
   z-index: 0;
   height: 200px;
 }
@@ -117,7 +117,7 @@ export default {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 200px;
+  height: 100%;
   background-size: cover;
   background-position: center;
   transition: transform 0.2s;
@@ -170,12 +170,14 @@ export default {
   margin-left: -4px;
 }
 .blog-card .description {
-  height: 150px;
+  /* height: 150px; removed fixed height to avoid overflow */
+  min-height: 150px;
   padding: 1rem;
-  flex-basis: 50%;
+  width: 100%;
   background: #fff;
   position: relative;
   z-index: 1;
+  box-sizing: border-box;
 }
 .blog-card .description h1,
 .blog-card .description h2 {
@@ -233,13 +235,13 @@ export default {
   left: 0%;
 }
 @media (min-width: 640px) {
-  .blog-card {
+  .blog-card >>> .el-card__body {
     flex-direction: row;
-    max-width: 700px;
   }
   .blog-card .meta {
     flex-basis: 40%;
-    height: auto;
+    height: auto; /* Let it fill height */
+    min-height: 200px;
   }
   .blog-card .description {
     flex-basis: 60%;
@@ -268,5 +270,8 @@ export default {
   }
 }
 
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+}
 </style>
-

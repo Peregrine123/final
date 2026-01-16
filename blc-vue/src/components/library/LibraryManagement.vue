@@ -1,22 +1,20 @@
 <template>
   <div v-if="this.role==='admin'">
-    <el-row style="margin: 18px 0px 0px 18px ">
+    <div class="management-header">
       <el-breadcrumb separator-class="el-icon-arrow-right">
         <el-breadcrumb-item><span style="font-weight: bold;">管理中心</span></el-breadcrumb-item>
         <el-breadcrumb-item>电影管理</el-breadcrumb-item>
       </el-breadcrumb>
-    </el-row>
+      <search-bar ref="searchBar" @onSearch="searchResult" class="header-search"></search-bar>
+    </div>
 
     <edit-form @onSubmit="loadMovies()" ref="edit"></edit-form>
 
-    <search-bar ref="searchBar" @onSearch="searchResult" style="position: absolute;right:100px;top:100px;"></search-bar>
-
-
-    <el-card style="margin: 18px 2%;width: 95%">
+    <el-card class="management-card">
       <el-table
           :data="movies.slice((currentPage-1)*pagesize,currentPage*pagesize)"
           stripe
-          style="width: 100%;height: 447px;"
+          style="width: 100%"
           >
         <el-table-column
             type="selection"
@@ -200,4 +198,23 @@ export default {
 </script>
 
 <style scoped>
+.management-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 2%;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.management-card {
+  width: 95%;
+  max-width: 1400px;
+  margin: 18px auto;
+}
+
+/* Ensure table expands */
+.el-table {
+  min-height: 400px;
+}
 </style>

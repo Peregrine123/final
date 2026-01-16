@@ -84,7 +84,31 @@
 - **开始**：2026-01-16
 - **截止**：2026-01-18（可按实际排期调整）
 
+## 执行记录 (Implementation Log)
+
+### 2026-01-16: 响应式改造完成
+- **状态**: ✅ 已完成 (Completed)
+- **主要变更**:
+  1. **全局布局 (Home.vue)**:
+     - 去除用于布局的绝对定位写法，使用“最小高度覆盖视口”的策略，修复页面滚动问题。
+  2. **认证页面 (Login.vue, Register.vue)**:
+     - 表单容器从固定宽度改为“百分比宽度 + 最大宽度限制”，提升不同窗口宽度下的适配性。
+     - 修复不规范的模板结构写法，并调整背景层实现方式，避免影响全局弹窗/下拉等组件层级。
+  3. **博客模块**:
+     - Articles.vue: 移除固定宽度/固定高度，改为容器最大宽度控制，并优化卡片布局的自适应表现。
+     - ArticleDetails.vue: 控制阅读宽度并处理图片/富文本内容的自适应，避免溢出。
+  4. **影视簿模块 (Library)**:
+     - CollectionDefault.vue & AddCollectionDefault.vue: 废弃 float，改为 CSS Grid 自适应列布局，实现卡片自动换行。
+  5. **管理后台**:
+     - LibraryManagement.vue: 搜索栏改为 flex 排列，表格与外层容器自适应宽度。
+     - CollectionManagement.vue & AddCollectionManagement.vue: 移除固定的 margin-top/宽度，改为自适应布局。
+  6. **首页 (AppIndex.vue)**:
+     - 优化卡片容器宽度策略，保证不同屏幕尺寸下不溢出且不无限拉伸。
+
+- **验证结果**:
+  - 前端构建通过。
+  - 清理了主要组件中的硬编码固定宽度写法（如 990px、1000px 等）。
+
 ## 关联信息
 - **对应 Issue**：N/A（仓库暂未发现 `issue/README.md` 或 issue 登记入口）
 - **相关 PR**：N/A
-

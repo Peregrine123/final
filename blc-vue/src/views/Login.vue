@@ -1,5 +1,5 @@
 <template>
-  <body class="bg1">
+  <div class="bg1">
   <el-form class="login-container" label-position="left"
            label-width="0px">
     <h3>密码登录</h3>
@@ -23,7 +23,7 @@
       <el-link type="primary" style="float:right" href="/">返回</el-link>
     </el-form-item>
   </el-form>
-  </body>
+  </div>
 </template>
 <script>
 
@@ -82,30 +82,25 @@ export default {
 }
 </script>
 
-<style>
-*{
-  z-index:0;
-}
-[v-cloak] {
-  display: none !important;
-}
+<style scoped>
 .bg1{
-  top: 0;
-  left: 0;
-  margin: 0px;
-  padding: 0;
-  background: url("../assets/bg3.jpg") no-repeat;
-  background-size: cover;
-  height: 100%;
+  min-height: 100vh;
   width: 100%;
-  position: fixed;
-  z-index: -1;
+  margin: 0;
+  padding: 24px;
+  box-sizing: border-box;
+  background: url("../assets/bg3.jpg") no-repeat center center;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .login-container {
   border-radius: 15px;
   background-clip: padding-box;
-  margin: 90px auto;
-  width: 350px;
+  /* margin: 90px auto; removed in favor of flex centering */
+  width: 90%; /* Responsive width */
+  max-width: 350px; /* Max width */
   padding: 35px 35px 15px 35px;
   background: #fff;
   border: 1px solid #eaeaea;
@@ -113,4 +108,3 @@ export default {
 }
 
 </style>
-

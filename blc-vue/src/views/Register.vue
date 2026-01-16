@@ -1,5 +1,5 @@
 <template>
-  <body class="bg2">
+  <div class="bg2">
   <el-form class="login-container" label-position="left" label-width="0px" v-loading="loading">
     <h3>用户注册</h3>
     <p style="color: red;">{{nameHint}}</p>
@@ -17,7 +17,7 @@
       <el-link type="primary" style="float:right" href="/">返回</el-link>
     </el-form-item>
   </el-form>
-  </body>
+  </div>
 </template>
 
 <script>
@@ -84,34 +84,25 @@ export default {
 }
 </script>
 
-<style>
-* {
-  z-index: 0;
-}
-[v-cloak] {
-  display: none !important;
-}
+<style scoped>
 .bg2 {
-  top: 0;
-  left: 0;
-  margin: 0px;
-  padding: 0;
-  background: url("../assets/bg2.jpg") no-repeat;
-  background-size: cover;
-  height: 100%;
+  min-height: 100vh;
   width: 100%;
-  position: fixed;
-  z-index: -1;
+  margin: 0;
+  padding: 24px 0;
+  box-sizing: border-box;
+  background: url("../assets/bg2.jpg") no-repeat center center;
+  background-size: cover;
 }
 .login-container {
   border-radius: 15px;
   background-clip: padding-box;
   margin: 90px auto;
-  width: 350px;
+  width: 90%; /* Responsive */
+  max-width: 350px; /* Fixed max width */
   padding: 35px 35px 15px 35px;
   background: #fff;
   border: 1px solid #eaeaea;
   box-shadow: 0 0 25px #cac6c6;
 }
 </style>
-

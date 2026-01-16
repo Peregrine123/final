@@ -14,16 +14,12 @@ export default {
 
 <style>
 .bg3{
-  position: absolute;
-  top: 0;
-  left: 0;
-  margin: 0px;
-  padding: 0;
-  height: 100%;
+  min-height: 100vh;
   width: 100%;
-  z-index: -1;
+  margin: 0;
+  padding: 0;
   background: none;
-  overflow: visible;
+  /* background-attachment: fixed; if there was a background image, but here it is none */
 }
 .nav-menu {
   margin: 0;

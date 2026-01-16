@@ -4,11 +4,11 @@
   <WorkMenu @indexSelect="listByCategory" ref="sideMenu"></WorkMenu>
 </el-aside>
 <el-container>
-<el-header>
+<el-header style="height: auto; padding-bottom: 20px;">
   <h2>最近收藏</h2>
   <SlidShow class="movie-show" ref="movieShow"></SlidShow>
 </el-header>
-<el-main style="margin-top: 350px">
+<el-main>
   <h2>收藏历史</h2>
   <CollectionDefault class="collection-default" ref="collectionDefault"></CollectionDefault>
 </el-main>
@@ -40,13 +40,14 @@ export default {
 
 <style scoped>
 .movie-show{
-  width:1000px;
+  width: 95%;
+  max-width: 1000px;
   margin-left: auto;
   margin-right: auto;
 }
 .collection-default{
-  /*margin-top: 300px;*/
-  width: 1000px;
+  width: 95%;
+  max-width: 1000px;
   margin-left: auto;
   margin-right: auto;
   align-content: center;

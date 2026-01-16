@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-row style="height: 800px;">
+    <div class="collection-grid">
     <el-tooltip effect="dark" placement="right"
                 v-for="item in collections.slice((currentPage-1)*pagesize,currentPage*pagesize)"
                 :key="item.id">
@@ -11,8 +11,7 @@
         <span>{{item.press}}</span>
       </p>
       <p slot="content" style="width: 300px" class="abstract">{{item.summary}}</p>
-      <el-card style="width: 200px;margin-bottom: 40px;height: 300px;float: left;margin-right: 30px" class="collection"
-               bodyStyle="padding:10px" shadow="hover">
+      <el-card class="collection-card" bodyStyle="padding:10px" shadow="hover">
         <div class="cover">
           <img :src="item.cover" alt="封面" class="coverImage">
         </div>
@@ -27,13 +26,14 @@
 <!--        <div class="cast">{{item.cast}}</div>-->
       </el-card>
     </el-tooltip>
-    </el-row>
+    </div>
     <el-row>
       <el-pagination
         @current-change="handleCurrentChange"
         :current-page="currentPage"
         :page-size="pagesize"
-        :total="collections.length">
+        :total="collections.length"
+        class="pagination">
       </el-pagination>
     </el-row>
   </div>
@@ -91,20 +91,50 @@ export default {
 </script>
 
 <style scoped>
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 30px;
+  padding: 20px;
+  justify-items: stretch;
+}
+
+.collection-grid > * {
+  width: 100%;
+}
+
+.collection-card {
+  width: 100%;
+  height: 300px;
+  border-radius: 25px;
+  transition: transform 0.3s;
+}
+
+.collection-card:hover {
+  transform: translateY(-5px);
+}
+
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
 .cover{
   width:150px;
   height:200px;
   margin-bottom: 7px;
   overflow: hidden;
   cursor: pointer;
-  margin-left: 15px;
+  margin: 0 auto 7px auto; /* Center cover */
 }
 .coverImage{
   width:150px;
   height:200px;
+  object-fit: cover;
 }
 .collection{
-  border-radius: 25px;
+  /* border-radius: 25px; removed as it's now on collection-card */
 }
 .collectionImage{
   margin-top: 20px;

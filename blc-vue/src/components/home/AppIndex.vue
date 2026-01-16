@@ -545,7 +545,8 @@ export default {
   overflow: hidden;
   background-size: cover;
   z-index: 1 !important;
-  width: 375px;
+  width: 100%; /* Responsive width */
+  max-width: 375px;
   height: 660px;
   display: block;
   border-radius: 4px;
