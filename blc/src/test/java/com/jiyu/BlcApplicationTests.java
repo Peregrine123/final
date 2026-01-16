@@ -5,6 +5,7 @@ import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class BlcApplicationTests {
 
     @Test

@@ -6,6 +6,7 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -30,6 +31,10 @@ public class WJRealm extends AuthorizingRealm {
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         String userName = token.getPrincipal().toString();
         User user = userService.getByUserName(userName);
+        if (user == null) {
+            // Avoid NPE -> 500; make it a proper auth failure so controller can return a friendly message.
+            throw new UnknownAccountException("User not found: " + userName);
+        }
         String passwordInDB = user.getPassword();
         String salt = user.getSalt();
         //salt 要用 byte[]
@@ -37,4 +42,3 @@ public class WJRealm extends AuthorizingRealm {
         return authenticationInfo;
     }
 }
-

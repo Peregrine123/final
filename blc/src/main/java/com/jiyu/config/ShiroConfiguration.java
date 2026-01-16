@@ -1,6 +1,7 @@
 package com.jiyu.config;
 
 import com.jiyu.realm.WJRealm;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
@@ -9,8 +10,10 @@ import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.filter.DelegatingFilterProxy;
 
 @Configuration
 public class ShiroConfiguration {
@@ -29,11 +32,28 @@ public class ShiroConfiguration {
         return shiroFilterFactoryBean;
     }
 
+    /**
+     * Register Shiro's web filter so each HTTP request gets a proper WebSubject/WebSession.
+     * Without this, calling SecurityUtils.getSubject() in controllers can fail at runtime.
+     */
+    @Bean
+    public FilterRegistrationBean<DelegatingFilterProxy> shiroFilterRegistration() {
+        FilterRegistrationBean<DelegatingFilterProxy> bean = new FilterRegistrationBean<>();
+        DelegatingFilterProxy proxy = new DelegatingFilterProxy("shiroFilter");
+        proxy.setTargetFilterLifecycle(true);
+        bean.setFilter(proxy);
+        bean.addUrlPatterns("/*");
+        bean.setOrder(Integer.MIN_VALUE);
+        return bean;
+    }
+
     //注册安全管理
     @Bean
     public SecurityManager securityManager() {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(getWJRealm());
+        // Make SecurityManager accessible via SecurityUtils in places that call it directly (e.g. LoginController).
+        SecurityUtils.setSecurityManager(securityManager);
         return securityManager;
     }
 
@@ -75,4 +95,3 @@ public class ShiroConfiguration {
     }
 
 }
-

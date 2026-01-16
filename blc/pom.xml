@@ -82,14 +82,7 @@
             <artifactId>nekohtml</artifactId>
             <version>1.9.22</version>
         </dependency>
-        <!-- 测试支持 -->
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
+        <!-- spring-boot-starter-test already provides JUnit (Jupiter) -->
         <!-- tomcat的支持.-->
         <!--配置JSP依赖，非常重要，否则就无法访问jsp页面-->
         <dependency>
@@ -111,6 +104,12 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.21</version>
         </dependency>
+        <!-- in-memory DB for tests (so classmates don't need local MySQL) -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
         <!-- shiro -->
         <dependency>
             <groupId>org.apache.shiro</groupId>
@@ -123,18 +122,7 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
-        </dependency>
+        <!-- testng removed: latest versions require newer JDK and break JDK8 test runs -->
     </dependencies>
 
     <build>
