@@ -10,7 +10,7 @@
   <div class="swiper-list" :style="{left:swiperLeft,transition:transition}">
     <div class="swiper-item"
          v-for="(item,index) in collections.slice(0,6)" :key="index"
-         :class="{active:tabIndex+2===index}" :style="{ 'background-image': 'url(' + item.cover + ')','background-repeat':'no-repeat','background-size':'auto'}"
+         :class="{active:tabIndex+2===index}" :style="coverStyle(item)"
     >
       <div style="background: rgba(0,0,0,0.5)">
         <div class="title">{{item.title}}</div>
@@ -91,6 +91,23 @@ export default {
             this.transition = 'all 0.3s'
           }, 360)
         }
+      }
+    },
+    coverStyle (item) {
+      const cover = item && item.cover ? String(item.cover).replace(/\"/g, '\\\"') : ''
+      if (!cover) {
+        return {
+          backgroundImage: 'linear-gradient(135deg, #111827 0%, #374151 100%)',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }
+      }
+      return {
+        backgroundImage: `url(\"${cover}\")`,
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
       }
     }
   },

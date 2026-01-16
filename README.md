@@ -26,6 +26,22 @@ npm install
 ./dev-up.sh
 ```
 
+如果你本机 MySQL 账号/密码/端口与项目默认配置不同（默认 `blc/blc123456@127.0.0.1:3306/blc`），推荐不要改代码，直接创建本地覆盖文件：`.run/dev.env`（已在 `.gitignore` 里）。
+
+示例：
+
+```bash
+cat > .run/dev.env <<'EOF'
+# Spring Boot datasource override
+SPRING_DATASOURCE_URL=jdbc:mysql://127.0.0.1:3306/blc?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+SPRING_DATASOURCE_USERNAME=root
+SPRING_DATASOURCE_PASSWORD=your_password
+
+# Optional: change frontend proxy target
+# VUE_APP_API_TARGET=http://localhost:8443
+EOF
+```
+
 WSL 注意：如果仓库在 `/mnt/<盘符>/...`（例如 `/mnt/d/...`），前端 dev server 可能会因为 9p 文件系统非常慢/卡住。建议把项目放到 WSL 的 Linux 文件系统目录（比如 `~/projects/...`）。本项目脚本会把 Maven 本地仓库、npm cache 放到 `.run/`，减少反复下载与写入开销。
 
 访问：
@@ -59,6 +75,18 @@ spring.datasource.password=blc123456
 
 ```bash
 mysql -u root -p blc < blc/blc.sql
+```
+
+可选：补充影评示例文章（用于演示 Task-006 的博客样式）
+
+```bash
+MYSQL_PWD=blc123456 mysql -h 127.0.0.1 -P 3306 -u blc -D blc < blc/seed-blog-2026.sql
+```
+
+可选：替换影库/影单示例数据（把旧的“书籍风格”条目替换成电影条目 + 海报网图）
+
+```bash
+MYSQL_PWD=blc123456 mysql -h 127.0.0.1 -P 3306 -u blc -D blc < blc/seed-library-2026.sql
 ```
 
 ### 2) 启动后端
