@@ -18,7 +18,7 @@
             <div class="movie-meta text-gray-light">
               <span>{{ movie.date ? movie.date.substring(0, 4) : 'Year' }}</span>
               <span class="divider">•</span>
-              <span>{{ mockData.genre }}</span>
+              <span>{{ movie.category ? movie.category.name : mockData.genre }}</span>
               <span class="divider">•</span>
               <span>{{ mockData.duration }}</span>
             </div>
