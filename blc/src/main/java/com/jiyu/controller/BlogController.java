@@ -1,11 +1,11 @@
 package com.jiyu.controller;
 
 import com.jiyu.pojo.BlogArticle;
+import com.jiyu.pojo.BlogPage;
 import com.jiyu.result.Result;
 import com.jiyu.result.ResultFactory;
 import com.jiyu.service.BlogArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
@@ -26,7 +26,7 @@ public class BlogController {
     }
 
     @GetMapping("/api/article/{size}/{page}")
-    public Page listArticles(@PathVariable("size") int size, @PathVariable("page") int page) {
+    public BlogPage listArticles(@PathVariable("size") int size, @PathVariable("page") int page) {
         return blogArticleService.list(page - 1, size);//page要减一
     }
 
