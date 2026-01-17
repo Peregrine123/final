@@ -54,7 +54,7 @@
 ### 可配置项（application.properties）
 - `blc.comment.max-length`：短评最大长度，默认 `280`
 - `blc.comment.rate-limit-seconds`：频控秒数，默认 `10`
-- `blc.comment.blocked-words`：敏感词（逗号分隔），默认空（例如：`badword,fuck,傻逼`）
+- `blc.comment.blocked-words`：敏感词（逗号分隔），默认空（例如：`spam,scam,敏感词`）
 
 ### 步骤
 1. 契约冻结：确定评分范围、短评字段、分页与排序。

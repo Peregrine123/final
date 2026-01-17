@@ -46,7 +46,7 @@ public class MovieCommentService {
     private long rateLimitSeconds;
 
     /**
-     * Comma-separated keyword list. Example: "badword,fuck,傻逼"
+     * Comma-separated keyword list. Example: "spam,scam,敏感词"
      */
     @Value("${blc.comment.blocked-words:}")
     private String blockedWordsRaw;
