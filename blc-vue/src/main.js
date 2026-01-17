@@ -112,6 +112,7 @@ Vue.component("card", {
 
 // 路由守卫
 router.beforeEach((to, from, next) => {
+    store.dispatch('startLoading');
     if (to.meta.requireAuth) {
         if (store.state.user.username !== '') {
             axios.get('/authentication')
@@ -132,6 +133,10 @@ router.beforeEach((to, from, next) => {
     } else {
         next();
     }
+});
+
+router.afterEach(() => {
+    store.dispatch('finishLoading');
 });
 
 new Vue({

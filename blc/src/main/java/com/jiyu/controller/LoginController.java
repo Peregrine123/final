@@ -3,6 +3,7 @@ package com.jiyu.controller;
 import com.jiyu.pojo.User;
 import com.jiyu.result.Result;
 import com.jiyu.result.ResultFactory;
+import com.jiyu.service.DemoUserActionsSeeder;
 import com.jiyu.service.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -20,6 +21,9 @@ public class LoginController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    DemoUserActionsSeeder demoUserActionsSeeder;
 
     private String normalizeUsername(String username) {
         if (username == null) {
@@ -80,6 +84,11 @@ public class LoginController {
         try {
             //登录验证
             subject.login(usernamePasswordToken);
+            try {
+                demoUserActionsSeeder.seedIfEmpty(userService.getByUserName(username));
+            } catch (Exception ignore) {
+                // Demo seeding must never block login.
+            }
             return ResultFactory.buildSuccessResult(username);
         } catch (AuthenticationException e) {
             String message = "账号或密码错误";
@@ -136,6 +145,11 @@ public class LoginController {
         user.setPassword(encodedPassword);
         user.setRole("normal");
         userService.add(user);
+        try {
+            demoUserActionsSeeder.seedIfEmpty(user);
+        } catch (Exception ignore) {
+            // Demo seeding must never block registration.
+        }
 
         return ResultFactory.buildSuccessResult(user);
     }

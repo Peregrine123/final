@@ -22,15 +22,16 @@
 - 观影状态：`user_movie_status(userId, movieId, status, markedAt, createdAt, updatedAt)`，并对 `(userId, movieId)` 做唯一性约束。
 - 状态枚举（建议最小集）：`WISH`（想看）、`WATCHED`（看过）。
 
-### 接口契约（建议）
-- 收藏
-  - 获取我的收藏列表：按时间倒序。
-  - 添加收藏：重复添加不产生重复记录（幂等）。
-  - 取消收藏：重复取消不报错（幂等）。
-- 观影状态
-  - 获取单片状态：返回当前用户对该电影的状态（无则为空）。
-  - 设置状态：支持想看/看过切换（按评审定版是否允许“看过 -> 想看”回退）。
-  - 获取我的想看/看过列表：按 `markedAt` 倒序。
+### 接口契约（定版）
+- 收藏（按当前登录用户维度；不接收 userId/username 参数）
+  - 获取我的收藏列表（按 `createdAt` 倒序）：`GET /api/me/favorites` -> `List<Movie>`
+  - 获取单片收藏状态：`GET /api/me/favorites/{movieId}` -> `{ favorited: boolean, createdAt: string | null }`
+  - 添加收藏（幂等，保留首次收藏时间）：`PUT /api/me/favorites/{movieId}` -> `{ favorited: true, createdAt: string }`
+  - 取消收藏（幂等）：`DELETE /api/me/favorites/{movieId}` -> `{ favorited: false, createdAt: null }`
+- 观影状态（按当前登录用户维度；不接收 userId/username 参数）
+  - 获取单片状态：`GET /api/me/movie-status/{movieId}` -> `{ status: 'WISH' | 'WATCHED' | null, markedAt: string | null }`
+  - 设置状态（允许 `WATCHED <-> WISH` 双向切换；同状态重复设置保持 `markedAt` 不变）：`PUT /api/me/movie-status/{movieId}` body `{ status: 'WISH' | 'WATCHED' }`
+  - 获取我的想看/看过列表（按 `markedAt` 倒序）：`GET /api/me/movie-status?status=WISH|WATCHED` -> `List<Movie>`
 
 ### 前端交互（建议最小闭环）
 - 电影详情页：

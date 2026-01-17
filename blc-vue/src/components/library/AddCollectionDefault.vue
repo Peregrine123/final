@@ -26,8 +26,20 @@
             </div>
           </div>
           <div class="collectionButton">
-            <img v-if="checkCollection(item.title)" :src="imageTrue" alt="选择" class="collectionImage">
-            <img v-else :src="imageFalse" alt="未选择" @click="chooseCollection(item)" class="collectionImage">
+            <img
+              v-if="checkCollection(item.id)"
+              :src="imageTrue"
+              alt="已收藏"
+              @click="toggleFavorite(item, false)"
+              class="collectionImage"
+            >
+            <img
+              v-else
+              :src="imageFalse"
+              alt="未收藏"
+              @click="toggleFavorite(item, true)"
+              class="collectionImage"
+            >
           </div>
         </el-card>
       </el-tooltip>
@@ -53,7 +65,7 @@ export default {
   data () {
     return {
       addCollections: [],
-      collections: [],
+      favoriteIds: [],
       movies: [],
       currentPage: 1,
       pagesize: 8,
@@ -62,15 +74,15 @@ export default {
     }
   },
   mounted: function () {
-    this.loadCollections()
+    this.loadFavorites()
     this.loadMovies()
   },
   methods: {
-    loadCollections () {
-      var _this = this
-      this.$axios.get('/collections').then(resp => {
+    loadFavorites () {
+      this.$axios.get('/me/favorites').then(resp => {
         if (resp && resp.status === 200) {
-          _this.collections = resp.data
+          const list = Array.isArray(resp.data) ? resp.data : []
+          this.favoriteIds = list.map(m => m && m.id).filter(Boolean)
         }
       })
     },
@@ -95,49 +107,36 @@ export default {
           }
         })
     },
-    checkCollection (title) {
-      var result = false
-      try {
-        this.collections.forEach(item => {
-          if (item.title === title) {
-            result = true
-            throw (result)
-          }
-        })
-      } catch (e) {
-        return e
-      }
-      return result
+    checkCollection (movieId) {
+      const id = parseInt(movieId)
+      if (!id) return false
+      return this.favoriteIds.includes(id)
     },
-    chooseCollection (item) {
-      this.$confirm('确定收藏该电影, 是否继续?', '提示', {
+    toggleFavorite (item, shouldFavorite) {
+      const id = item && item.id ? parseInt(item.id) : 0
+      if (!id) return
+      const title = item && item.title ? item.title : '该电影'
+      const message = shouldFavorite ? `确定收藏 ${title} 吗？` : `确定取消收藏 ${title} 吗？`
+      this.$confirm(message, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        item.id = (this.collections.length + 1).toString()
-        this.$axios
-          .post('/user/add', {
-            id: item.id,
-            cover: item.cover,
-            title: item.title,
-            cast: item.cast,
-            date: item.date,
-            press: item.press,
-            summary: item.summary,
-            category: item.category}).then(resp => {
-            if (resp && resp.status === 200) {
-              this.loadCollections()
-            }
-          })
-      }
-      ).catch(() => {
+        const req = shouldFavorite
+          ? this.$axios.put(`/me/favorites/${id}`)
+          : this.$axios.delete(`/me/favorites/${id}`)
+        req.then(resp => {
+          if (resp && resp.status === 200) {
+            this.loadFavorites()
+          }
+        })
+      }).catch(() => {
         this.$message({
           type: 'info',
-          message: '已取消收藏'
+          message: '已取消操作'
         })
       })
-    }
+    },
   }
 
 }

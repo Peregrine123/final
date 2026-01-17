@@ -1,11 +1,23 @@
 <template>
   <div id="app">
+    <AppLoading />
     <div id="nav">
 
     </div>
     <router-view/>
   </div>
 </template>
+
+<script>
+import AppLoading from '@/components/common/AppLoading.vue'
+
+export default {
+  name: 'App',
+  components: {
+    AppLoading
+  }
+}
+</script>
 
 <style>
 #app {

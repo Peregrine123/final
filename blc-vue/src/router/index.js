@@ -62,7 +62,10 @@ const routes = [
         path: '/MovieDetails/:id',
         name: 'MovieDetails',
         component: MovieDetails,
-        props: true
+        props: true,
+        meta: {
+          requireAuth: true
+        }
       },
       {
         path: '/blog',

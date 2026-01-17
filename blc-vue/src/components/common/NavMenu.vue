@@ -4,7 +4,7 @@
       <!-- Left: Brand/Logo -->
       <div class="brand-section" @click="$router.push('/index')">
         <img src="@/assets/logo.png" alt="Logo" class="brand-logo">
-        <span class="brand-text">FilmTalk</span>
+        <span class="brand-text">LightTrace</span>
       </div>
 
       <!-- Center: Navigation -->

@@ -25,18 +25,44 @@
             
             <div class="rating-section">
               <el-rate
-                v-model="mockData.rating"
+                :value="ratingSummaryDisplay"
                 disabled
-                show-score
+                :show-score="ratingSummary.count > 0"
+                allow-half
                 text-color="#ff9900"
                 score-template="{value}">
               </el-rate>
-              <span class="rating-count">({{ mockData.ratingCount }} 人评价)</span>
+              <span v-if="ratingSummary.count > 0" class="rating-count">
+                ({{ ratingSummary.count }} 人评价)
+              </span>
+              <span v-else class="rating-count">(暂无评分)</span>
             </div>
 
             <div class="action-buttons">
-              <el-button type="primary" icon="el-icon-edit">写影评</el-button>
-              <el-button type="warning" icon="el-icon-star-off">收藏</el-button>
+              <el-button
+                v-if="isAdmin"
+                type="primary"
+                icon="el-icon-edit"
+                @click="goToWriteReview"
+              >写影评</el-button>
+              <el-button
+                :type="watchStatus === 'WISH' ? 'success' : 'default'"
+                icon="el-icon-time"
+                :loading="watchStatusLoading"
+                @click="setWatchStatus('WISH')"
+              >想看</el-button>
+              <el-button
+                :type="watchStatus === 'WATCHED' ? 'success' : 'default'"
+                icon="el-icon-circle-check"
+                :loading="watchStatusLoading"
+                @click="setWatchStatus('WATCHED')"
+              >看过</el-button>
+              <el-button
+                type="warning"
+                :icon="favorited ? 'el-icon-star-on' : 'el-icon-star-off'"
+                :loading="favoriteLoading"
+                @click="toggleFavorite"
+              >{{ favorited ? '已收藏' : '收藏' }}</el-button>
               <el-button plain icon="el-icon-share">分享</el-button>
             </div>
           </el-col>
@@ -71,16 +97,73 @@
           </section>
 
           <section class="section-block">
-             <h2 class="section-title">短评</h2>
-             <div class="reviews-list">
-               <div v-for="review in mockData.reviews" :key="review.id" class="review-item">
-                 <div class="review-header">
-                   <span class="review-author">{{ review.author }}</span>
-                   <el-rate v-model="review.rating" disabled text-color="#ff9900" class="mini-rate"></el-rate>
-                   <span class="review-date">{{ review.date }}</span>
-                 </div>
-                 <p class="review-content">{{ review.content }}</p>
+             <h2 class="section-title">我的短评</h2>
+             <div class="my-comment">
+               <div class="my-comment-row">
+                 <span class="my-comment-label">评分</span>
+                 <el-rate
+                   v-model="myCommentForm.rating"
+                   :max="5"
+                   text-color="#ff9900"
+                   show-score>
+                 </el-rate>
                </div>
+
+               <el-input
+                 v-model="myCommentForm.content"
+                 type="textarea"
+                 :rows="3"
+                 maxlength="280"
+                 show-word-limit
+                 placeholder="写下你的短评（可只评分或只写短评）"
+               />
+
+               <div class="my-comment-actions">
+                 <el-button
+                   type="primary"
+                   :loading="myCommentSubmitting"
+                   @click="submitMyComment"
+                 >提交</el-button>
+                 <span v-if="myComment && myComment.updatedAt" class="my-comment-tip">
+                   更新于：{{ formatDate(myComment.updatedAt) }}
+                 </span>
+               </div>
+             </div>
+
+             <h2 class="section-title" style="margin-top: 30px;">大家的短评</h2>
+             <div class="reviews-list" v-loading="commentsLoading">
+               <div v-if="comments.items.length === 0" class="review-empty">暂无短评</div>
+               <div v-for="c in comments.items" :key="c.id" class="review-item">
+                 <div class="review-header">
+                   <span class="review-author">{{ c.username || '匿名' }}</span>
+                   <el-rate
+                     v-if="c.rating"
+                     v-model="c.rating"
+                     disabled
+                     text-color="#ff9900"
+                     class="mini-rate"
+                   />
+                   <span class="review-date">{{ formatDate(c.createdAt) }}</span>
+                   <el-button
+                     size="mini"
+                     :type="c.likedByMe ? 'primary' : 'text'"
+                     :loading="!!c.likeLoading"
+                     class="like-btn"
+                     @click="toggleLike(c)"
+                   >{{ c.likedByMe ? '已赞' : '点赞' }} {{ c.likeCount || 0 }}</el-button>
+                 </div>
+                 <p class="review-content">{{ c.content || '' }}</p>
+               </div>
+             </div>
+
+             <div v-if="comments.total > comments.size" class="reviews-pagination">
+               <el-pagination
+                 layout="prev, pager, next"
+                 :page-size="comments.size"
+                 :total="comments.total"
+                 :current-page="comments.page"
+                 @current-change="handleCommentsPageChange"
+               />
              </div>
           </section>
         </el-col>
@@ -142,16 +225,32 @@ export default {
       relatedMovies: [],
       loading: true,
       defaultCover,
-      // Mock data for UI elements not supported by backend
+      role: '',
+      favorited: false,
+      favoriteLoading: false,
+      watchStatus: null, // 'WISH' | 'WATCHED' | null
+      watchStatusLoading: false,
+      // UI-only placeholders (not provided by backend in this project)
       mockData: {
-        rating: 4.5,
-        ratingCount: 1234,
         genre: '剧情 / 爱情',
-        duration: '120分钟',
-        reviews: [
-          { id: 1, author: 'Alice', rating: 5, date: '2023-10-01', content: '这部电影太棒了！画面精美，剧情感人。' },
-          { id: 2, author: 'Bob', rating: 4, date: '2023-10-05', content: '整体不错，但是结局有点仓促。' }
-        ]
+        duration: '120分钟'
+      },
+      ratingSummary: {
+        average: null,
+        count: 0
+      },
+      myComment: null,
+      myCommentForm: {
+        rating: 0,
+        content: ''
+      },
+      myCommentSubmitting: false,
+      commentsLoading: false,
+      comments: {
+        items: [],
+        total: 0,
+        page: 1,
+        size: 10
       }
     };
   },
@@ -165,10 +264,20 @@ export default {
         backgroundSize: 'cover',
         backgroundPosition: 'center top'
       };
+    },
+    ratingSummaryDisplay() {
+      const avg = this.ratingSummary && this.ratingSummary.average != null ? Number(this.ratingSummary.average) : 0;
+      // el-rate with allow-half displays half steps; round for a stable UI.
+      const rounded = Math.round(avg * 2) / 2;
+      return isNaN(rounded) ? 0 : rounded;
+    },
+    isAdmin() {
+      return this.role === 'admin'
     }
   },
   created() {
     this.loadMovieDetails();
+    this.loadRole();
   },
   watch: {
     '$route.params.id': function () {
@@ -176,6 +285,53 @@ export default {
     }
   },
   methods: {
+    loadRole() {
+      const userStr = window.localStorage.getItem('user')
+      let username = ''
+      try {
+        username = userStr ? (JSON.parse(userStr).username || '') : ''
+      } catch (e) {
+        username = ''
+      }
+      if (!username) {
+        this.role = ''
+        return
+      }
+      this.$axios.get('/user/role?username=' + username)
+        .then(resp => {
+          if (resp && resp.status === 200 && resp.data && resp.data.code === 200) {
+            this.role = resp.data.result
+          } else {
+            this.role = ''
+          }
+        })
+        .catch(() => {
+          this.role = ''
+        })
+    },
+    goToWriteReview() {
+      if (!this.isAdmin) return
+      const m = this.movie || {}
+      const title = m.title ? `《${m.title}》影评` : '影评'
+      const abstract = m.summary || ''
+      const cover = m.cover || ''
+      const md = (abstract ? `## 影片简介\n\n${abstract}\n\n` : '') + '## 影评\n\n'
+
+      this.$router.push({
+        name: 'ArticleEditor',
+        params: {
+          article: {
+            id: '',
+            articleTitle: title,
+            articleAbstract: abstract,
+            articleCover: cover,
+            articleContentMd: md,
+            articleContentHtml: '',
+            articleDate: ''
+          }
+        }
+      })
+    },
     loadMovieDetails() {
       const id = parseInt(this.$route.params.id); // Ensure ID type matches
       this.loading = true;
@@ -190,8 +346,13 @@ export default {
           const found = movies.find(m => m.id == id);
           if (found) {
             this.movie = found;
-            // Generate deterministic mock rating based on ID for consistency
-            this.mockData.rating = (id % 5) + 1; // Random-ish rating 1-5
+            this.loadUserActions(found.id);
+            this.loadRatingSummary(found.id);
+            this.loadMyComment(found.id);
+            this.comments.page = 1;
+            this.comments.items = [];
+            this.comments.total = 0;
+            this.loadApprovedComments(found.id);
             this.relatedMovies = this.buildRelatedMovies(movies, found, 3);
           } else {
             this.$message.error('未找到该电影信息');
@@ -202,6 +363,178 @@ export default {
         console.error(err);
         this.loading = false;
         this.$message.error('加载失败');
+      });
+    },
+    loadUserActions(movieId) {
+      const mid = parseInt(movieId);
+      if (!mid) return;
+      // Load in parallel; if not logged in, global interceptor will redirect.
+      this.favoriteLoading = true;
+      this.watchStatusLoading = true;
+      Promise.all([
+        this.$axios.get(`/me/favorites/${mid}`),
+        this.$axios.get(`/me/movie-status/${mid}`)
+      ]).then(([favResp, statusResp]) => {
+        if (favResp && favResp.status === 200) {
+          this.favorited = !!(favResp.data && favResp.data.favorited);
+        }
+        if (statusResp && statusResp.status === 200) {
+          this.watchStatus = statusResp.data ? statusResp.data.status : null;
+        }
+      }).catch(err => {
+        console.error(err);
+      }).finally(() => {
+        this.favoriteLoading = false;
+        this.watchStatusLoading = false;
+      });
+    },
+    loadRatingSummary(movieId) {
+      const mid = parseInt(movieId);
+      if (!mid) return;
+      this.$axios.get(`/movies/${mid}/rating-summary`).then(resp => {
+        if (resp && resp.status === 200) {
+          this.ratingSummary = resp.data || { average: null, count: 0 };
+        }
+      }).catch(err => {
+        console.error(err);
+      });
+    },
+    loadMyComment(movieId) {
+      const mid = parseInt(movieId);
+      if (!mid) return;
+      this.$axios.get(`/me/movie-comments/${mid}`).then(resp => {
+        if (resp && resp.status === 200) {
+          this.myComment = resp.data;
+          this.myCommentForm.rating = this.myComment && this.myComment.rating ? this.myComment.rating : 0;
+          this.myCommentForm.content = this.myComment && this.myComment.content ? this.myComment.content : '';
+        }
+      }).catch(err => {
+        // 404 means "no comment yet"
+        if (err && err.response && err.response.status === 404) {
+          this.myComment = null;
+          this.myCommentForm.rating = 0;
+          this.myCommentForm.content = '';
+          return;
+        }
+        console.error(err);
+      });
+    },
+    loadApprovedComments(movieId) {
+      const mid = parseInt(movieId);
+      if (!mid) return;
+      this.commentsLoading = true;
+      const page = this.comments.page || 1;
+      const size = this.comments.size || 10;
+      this.$axios.get(`/movies/${mid}/comments?page=${page}&size=${size}`).then(resp => {
+        if (resp && resp.status === 200) {
+          const data = resp.data || {};
+          this.comments.items = Array.isArray(data.items) ? data.items : [];
+          this.comments.total = data.total || 0;
+          this.comments.page = data.page || page;
+          this.comments.size = data.size || size;
+        }
+      }).catch(err => {
+        console.error(err);
+      }).finally(() => {
+        this.commentsLoading = false;
+      });
+    },
+    handleCommentsPageChange(page) {
+      this.comments.page = page;
+      this.loadApprovedComments(this.movie && this.movie.id);
+    },
+    submitMyComment() {
+      const mid = this.movie && this.movie.id ? parseInt(this.movie.id) : 0;
+      if (!mid) return;
+
+      const ratingNum = Number(this.myCommentForm.rating || 0);
+      const rating = ratingNum > 0 ? ratingNum : null;
+      const content = this.myCommentForm.content;
+
+      this.myCommentSubmitting = true;
+      this.$axios.put(`/me/movie-comments/${mid}`, { rating, content }).then(resp => {
+        if (resp && resp.status === 200) {
+          this.myComment = resp.data;
+          this.myCommentForm.rating = this.myComment && this.myComment.rating ? this.myComment.rating : 0;
+          this.myCommentForm.content = this.myComment && this.myComment.content ? this.myComment.content : '';
+          this.watchStatus = 'WATCHED';
+          this.$message.success('发布成功');
+          this.loadRatingSummary(mid);
+          this.comments.page = 1;
+          this.loadApprovedComments(mid);
+        }
+      }).catch(err => {
+        console.error(err);
+        const msg = err && err.response && err.response.data && err.response.data.message
+          ? String(err.response.data.message)
+          : '提交失败';
+        this.$message.error(msg);
+      }).finally(() => {
+        this.myCommentSubmitting = false;
+      });
+    },
+    toggleLike(comment) {
+      if (!comment || !comment.id) return;
+      const cid = parseInt(comment.id);
+      if (!cid) return;
+
+      this.$set(comment, 'likeLoading', true);
+      const req = comment.likedByMe
+        ? this.$axios.delete(`/me/movie-comment-likes/${cid}`)
+        : this.$axios.put(`/me/movie-comment-likes/${cid}`);
+
+      req.then(resp => {
+        if (resp && resp.status === 200) {
+          comment.likedByMe = !!(resp.data && resp.data.liked);
+          comment.likeCount = resp.data && typeof resp.data.likeCount === 'number' ? resp.data.likeCount : (comment.likeCount || 0);
+        }
+      }).catch(err => {
+        console.error(err);
+        this.$message.error('操作失败');
+      }).finally(() => {
+        this.$set(comment, 'likeLoading', false);
+      });
+    },
+    formatDate(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return String(iso);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    },
+    toggleFavorite() {
+      const mid = this.movie && this.movie.id ? parseInt(this.movie.id) : 0;
+      if (!mid) return;
+      this.favoriteLoading = true;
+      const req = this.favorited
+        ? this.$axios.delete(`/me/favorites/${mid}`)
+        : this.$axios.put(`/me/favorites/${mid}`);
+      req.then(resp => {
+        if (resp && resp.status === 200) {
+          this.favorited = !!(resp.data && resp.data.favorited);
+        }
+      }).catch(err => {
+        console.error(err);
+        this.$message.error('操作失败');
+      }).finally(() => {
+        this.favoriteLoading = false;
+      });
+    },
+    setWatchStatus(status) {
+      const mid = this.movie && this.movie.id ? parseInt(this.movie.id) : 0;
+      if (!mid) return;
+      this.watchStatusLoading = true;
+      this.$axios.put(`/me/movie-status/${mid}`, { status }).then(resp => {
+        if (resp && resp.status === 200) {
+          this.watchStatus = resp.data ? resp.data.status : status;
+        }
+      }).catch(err => {
+        console.error(err);
+        this.$message.error('操作失败');
+      }).finally(() => {
+        this.watchStatusLoading = false;
       });
     },
     buildRelatedMovies(allMovies, currentMovie, limit) {
@@ -429,6 +762,44 @@ export default {
 .review-content {
   color: #666;
   line-height: 1.6;
+}
+
+.like-btn {
+  margin-left: 8px;
+}
+
+.my-comment-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.my-comment-label {
+  width: 48px;
+  color: #666;
+}
+
+.my-comment-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.my-comment-tip {
+  color: #999;
+  font-size: 0.85rem;
+}
+
+.review-empty {
+  color: #999;
+  padding: 12px 0;
+}
+
+.reviews-pagination {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
 }
 
 /* Sidebar */

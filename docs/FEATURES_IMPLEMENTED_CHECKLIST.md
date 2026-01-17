@@ -45,14 +45,16 @@
 - `[ ] 未实现（不在本项目范围）` 观看电影（在线播放/离线下载）
   - 说明：本项目定位为影评/电影条目系统（类似豆瓣），不做站内流媒体播放与下载；如需“观影入口”，建议以第三方平台跳转链接的形式另行规划。
 
-- `[ ] 未实现` 查看历史记录（观影记录）
-  - 说明：计划按“想看/看过”维度沉淀用户观影记录，并在个人中心按时间倒序展示（替代“续看进度”概念）。
+- `[x]` 查看历史记录（观影记录：想看/看过）
+  - 已有：后端用户观影状态接口 `/api/me/movie-status/*`（`WISH`/`WATCHED`），按 `markedAt` 倒序返回列表。
+  - 已有：前端个人收藏室页面提供“想看/看过”列表展示（`blc-vue/src/components/library/CollectionManagement.vue`）。
 
 - `[ ] 未实现` 评论和评分（含点赞/回复、审核机制）
 
-- `[~] 部分实现` 收藏电影
-  - 已有：收藏页/添加收藏页（`blc-vue/src/components/library/CollectionManagement.vue`、`AddCollectionManagement.vue` 等），后端接口 `/api/collections`、`/api/user/add`、`/api/user/delete`。
-  - 未有：按“用户维度”的收藏（当前 `collection` 数据未绑定 `userId`/`username`，更像全局收藏表，无法区分不同用户）。
+- `[x]` 收藏电影（按用户维度、幂等）
+  - 已有：后端收藏接口 `/api/me/favorites/*`（幂等添加/取消、按时间倒序列表）。
+  - 已有：详情页“收藏”按钮与状态联动（`blc-vue/src/components/library/MovieDetails.vue`）。
+  - 已有：个人收藏室展示“我的收藏”列表（`blc-vue/src/components/library/CollectionManagement.vue`）。
 
 ---
 

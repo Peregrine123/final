@@ -15,8 +15,8 @@
 
     <!-- 中心文字 -->
     <div id="center-content" ref="content">
-      <h1>影博汇</h1>
-      <h2>FilmTalk</h2>
+      <h1>光影迹</h1>
+      <h2>LightTrace</h2>
       <p></p>
       <div class="buttons">
 
@@ -175,7 +175,7 @@
       <router-link to="/blog"  class="custom-btn btn-12"><span>请点击!</span><span>阅读更多</span></router-link>
     </div>
 
-    <h1 class='elegantshadow'>FilmTalk_影博汇</h1>
+    <h1 class='elegantshadow'>LightTrace_光影迹</h1>
     <p></p>
     <h2 class='elegantshadow'>联系我们</h2>
 
