@@ -63,7 +63,7 @@ export default {
       dialogFormVisible: false,
       dialogTitle:"添加电影",
       form: {
-        id: '',
+        id: 0,
         title: '',
         cast: '',
         date: '',
@@ -86,7 +86,7 @@ export default {
     clear () {
       this.$refs.imgUpload.clearFiles()
       this.form = {
-        id: '',
+        id: 0,
         title: '',
         cast: '',
         date: '',
@@ -100,9 +100,11 @@ export default {
       }
     },
     onSubmit () {
+      const idNum = parseInt(this.form.id, 10)
+      const safeId = isNaN(idNum) ? 0 : idNum
       this.$axios
           .post('/admin/movies', {
-            id: this.form.id,
+            id: safeId,
             cover: this.form.cover,
             title: this.form.title,
             cast: this.form.cast,
@@ -132,5 +134,4 @@ export default {
   cursor: pointer;
 }
 </style>
-
 

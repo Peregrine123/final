@@ -36,6 +36,7 @@
 
 <script>
 import SearchBar from './SearchBar'
+import { dedupeMovies } from '@/utils/dedupe'
 export default {
   name: 'MoviesDefault',
   components: {SearchBar},
@@ -54,7 +55,8 @@ export default {
       var _this = this
       this.$axios.get('/movies').then(resp => {
         if (resp && resp.status === 200) {
-          _this.movies = resp.data
+          _this.movies = dedupeMovies(resp.data)
+          _this.currentPage = 1
         }
       })
     },
@@ -67,7 +69,8 @@ export default {
           .get('/search?keywords=' + this.$refs.searchBar.keywords, {
           }).then(resp => {
         if (resp && resp.status === 200) {
-          _this.movies = resp.data
+          _this.movies = dedupeMovies(resp.data)
+          _this.currentPage = 1
         }
       })
     },

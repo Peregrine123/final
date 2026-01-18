@@ -105,6 +105,7 @@
 
 <script>
 import defaultCover from "@/assets/remote/no-cover.svg";
+import { dedupeMovies } from '@/utils/dedupe'
 
 export default {
   name: 'CollectionManagement',
@@ -151,7 +152,7 @@ export default {
       this.loadingFavorites = true
       this.$axios.get('/me/favorites').then(resp => {
         if (resp && resp.status === 200) {
-          this.favorites = Array.isArray(resp.data) ? resp.data : []
+          this.favorites = dedupeMovies(resp.data)
           this.currentPageFavorites = 1
         }
       }).finally(() => {
@@ -162,7 +163,7 @@ export default {
       this.loadingWish = true
       this.$axios.get('/me/movie-status?status=WISH').then(resp => {
         if (resp && resp.status === 200) {
-          this.wishMovies = Array.isArray(resp.data) ? resp.data : []
+          this.wishMovies = dedupeMovies(resp.data)
           this.currentPageWish = 1
         }
       }).finally(() => {
@@ -173,7 +174,7 @@ export default {
       this.loadingWatched = true
       this.$axios.get('/me/movie-status?status=WATCHED').then(resp => {
         if (resp && resp.status === 200) {
-          this.watchedMovies = Array.isArray(resp.data) ? resp.data : []
+          this.watchedMovies = dedupeMovies(resp.data)
           this.currentPageWatched = 1
         }
       }).finally(() => {

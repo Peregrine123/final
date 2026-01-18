@@ -216,6 +216,7 @@
 
 <script>
 import defaultCover from "@/assets/remote/no-cover.svg";
+import { dedupeMovies } from '@/utils/dedupe'
 
 export default {
   name: 'MovieDetails',
@@ -338,7 +339,7 @@ export default {
       this.relatedMovies = [];
       this.$axios.get('/movies').then(resp => {
         if (resp && resp.status === 200) {
-          const movies = resp.data;
+          const movies = dedupeMovies(resp.data);
           // Find the movie by ID. 
           // Note: Assuming API returns a list and we filter client-side as per original code.
           // Original code used a loop, using find here is cleaner.

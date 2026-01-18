@@ -40,6 +40,7 @@
 </template>
 
 <script>
+import { dedupeMovies } from '@/utils/dedupe'
 export default {
   name: 'CollectionDefault',
   data () {
@@ -58,7 +59,8 @@ export default {
       var _this = this
       this.$axios.get('/collections').then(resp => {
         if (resp && resp.status === 200) {
-          _this.collections = resp.data
+          _this.collections = dedupeMovies(resp.data)
+          _this.currentPage = 1
         }
       })
     },

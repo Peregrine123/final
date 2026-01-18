@@ -12,6 +12,7 @@
 <script>
 import AddCollectionDefault from './AddCollectionDefault'
 import SideMenu from './SideMenu'
+import { dedupeMovies } from '@/utils/dedupe'
 export default {
   name: 'AddCollectionManagement',
   components: {AddCollectionDefault, SideMenu},
@@ -22,7 +23,8 @@ export default {
       var url = 'categories/' + cid + '/movies'
       this.$axios.get(url).then(resp => {
         if (resp && resp.status === 200) {
-          _this.$refs.collectionArea.movies = resp.data
+          _this.$refs.collectionArea.movies = dedupeMovies(resp.data)
+          _this.$refs.collectionArea.currentPage = 1
         }
       })
     }

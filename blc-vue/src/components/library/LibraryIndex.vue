@@ -11,9 +11,9 @@
 
 <script>
 import SideMenu from './SideMenu'
-import Movies from './Movies'
 
 import MoviesDefault from "@/components/library/MoviesDefault";
+import { dedupeMovies } from '@/utils/dedupe'
 
 export default {
   name: 'AppLibrary',
@@ -25,7 +25,8 @@ export default {
       var url = 'categories/' + cid + '/movies'
       this.$axios.get(url).then(resp => {
         if (resp && resp.status === 200) {
-          _this.$refs.moviesArea.movies = resp.data
+          _this.$refs.moviesArea.movies = dedupeMovies(resp.data)
+          _this.$refs.moviesArea.currentPage = 1
         }
       })
     }
@@ -41,5 +42,3 @@ export default {
   margin-right: auto;
 }
 </style>
-
-
